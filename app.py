@@ -66,25 +66,11 @@ if not data.empty:
 
     st.markdown("---")
 
-   # --- SECTION 2: PERFORMANCE & TREND ANALYSIS ---
-    st.subheader("📈 Performance & Trend Analysis")
-    
-    if show_sma:
-        st.markdown("### 🔍 Technical Trend: Crude Oil (WTI)")
-        # Cálculo da Média Móvel de 20 dias para o Petróleo
-        oil_data = data[['Crude Oil']].copy()
-        oil_data['20-Day SMA'] = oil_data['Crude Oil'].rolling(window=20).mean()
-        
-        # Gráfico focado em tendência
-        st.line_chart(oil_data, height=400)
-        st.caption("The 20-Day Simple Moving Average (SMA) helps identify the current price trend, smoothing out daily volatility.")
-    else:
-        # Gráfico Geral de Performance Normalizada (Base 100)
-        st.markdown("### Comparative Performance (Base 100)")
-        norm = (data / data.iloc[0]) * 100
-        st.line_chart(norm, height=400)
-        st.caption("Standardized comparison starting at 100 to visualize relative growth across different assets.")
-
+  # --- SECTION 2: PERFORMANCE ANALYSIS ---
+    st.subheader("📈 Comparative Performance (Base 100)")
+    norm = (data / data.iloc[0]) * 100
+    st.line_chart(norm, height=450)
+    st.caption("Standardized comparison starting at 100 to visualize relative growth across different assets.")
     # --- SECTION 3: RISK & CORRELATION (UNIFIED) ---
     st.subheader("🎯 Risk & Correlation Analysis")
     c1, c2 = st.columns(2)
