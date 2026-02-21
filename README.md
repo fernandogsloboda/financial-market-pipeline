@@ -28,6 +28,7 @@ This project is an automated **ETL (Extract, Transform, Load) Pipeline** built i
 ### Phase 3: Visualization & Export
 - **Base 100 Normalization:** Standardized all asset prices to a starting value of 100. This allows for an accurate visual comparison of percentage growth regardless of the underlying asset's nominal price (e.g., comparing $5,000 Gold to $60 Oil).
 - **Automated Export:** Generates clean `.csv` datasets and high-resolution `.png` charts ready for business intelligence dashboards or management reports.
+- ![Asset Performance Chart - Last 30 Days](data/asset_performance_chart.png)
 
 ---
 
