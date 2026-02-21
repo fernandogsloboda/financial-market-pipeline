@@ -3,74 +3,90 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
 
-# 1. Page Configuration
-st.set_page_config(page_title="Market Intelligence Dashboard", layout="wide")
+st.set_page_config(page_title="Market Intelligence Pro", layout="wide")
 
-# 2. Hero Section
-st.title("📈 Financial Market Intelligence Dashboard")
-st.markdown("Automated ETL Pipeline for Commodities and FX Analysis.")
+# --- CUSTOM CSS FOR BETTER VISUALS ---
+st.markdown("""
+    <style>
+    .main { background-color: #fafafa; }
+    .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    </style>
+    """, unsafe_base_curve=True)
+
+st.title("📈 Professional Market Intelligence Dashboard")
+st.markdown("Automated ETL & Quantitative Analytics for Global Assets.")
 st.markdown("---")
 
-# 3. Sidebar Configuration
+# --- SIDEBAR ---
 st.sidebar.header("⚙️ Analysis Parameters")
 dias_historico = st.sidebar.slider("Select Timeframe (Days):", min_value=7, max_value=365, value=30)
 
-# 4. Robust Data Extraction Function
 @st.cache_data(ttl=3600)
 def carregar_dados(dias):
     tickers = ["CL=F", "GC=F", "ZC=F", "BRL=X"]
     end_date = datetime.today()
     start_date = end_date - timedelta(days=dias)
-    
-    # Robust download (works with latest yfinance version)
     df = yf.download(tickers, start=start_date, end=end_date, progress=False)
     
-    if df.empty:
-        return pd.DataFrame()
+    if df.empty: return pd.DataFrame()
         
-    # Isolate Closing Prices
     close_prices = df['Close'].copy()
-    
-    # Ensure all columns exist
     for ticker in tickers:
-        if ticker not in close_prices.columns:
-            close_prices[ticker] = None
+        if ticker not in close_prices.columns: close_prices[ticker] = None
             
     close_prices = close_prices[tickers]
     close_prices.columns = ["Crude Oil (WTI)", "Gold", "Corn", "USD/BRL"]
-    
-    # Data Cleaning (Forward Fill for market holidays)
     return close_prices.ffill().dropna()
 
-st.write(f"🔄 Extracting data for the last **{dias_historico} days** via Yahoo Finance API...")
-
-# Execute Extraction
 dados_limpos = carregar_dados(dias_historico)
 
-# 5. Safety Shield & Display
 if dados_limpos.empty:
-    st.error("⚠️ Data returned empty. Yahoo Finance might be unstable or markets are closed. Try adjusting the timeframe in the sidebar.")
+    st.error("⚠️ Data connection failed. Please try again.")
 else:
-    # Top Metrics Row
-    col1, col2 = st.columns(2)
+    # --- SECTION 1: KEY PERFORMANCE INDICATORS (KPIs) ---
+    st.subheader("📌 Current Market Snapshot")
+    cols = st.columns(4)
+    
+    for i, asset in enumerate(dados_limpos.columns):
+        current_price = dados_limpos[asset].iloc[-1]
+        previous_price = dados_limpos[asset].iloc[-2]
+        delta = ((current_price - previous_price) / previous_price) * 100
+        
+        # Formatação especial para o câmbio
+        fmt = "R$ {:.2f}" if "BRL" in asset else "$ {:.2f}"
+        cols[i].metric(label=asset, value=fmt.format(current_price), delta=f"{delta:.2f}%")
 
-    with col1:
-        st.subheader("📊 Price History (Raw Data)")
+    st.markdown("---")
+
+    # --- SECTION 2: PERFORMANCE & VOLATILITY ---
+    col_left, col_right = st.columns([2, 1])
+
+    with col_left:
+        st.subheader("📊 Comparative Performance (Base 100)")
+        dados_normalizados = (dados_limpos / dados_limpos.iloc[0]) * 100
+        st.line_chart(dados_normalizados, height=400)
+
+    with col_right:
+        st.subheader("⚡ Risk (Daily Volatility)")
+        # Calculando a volatilidade (Desvio padrão dos retornos)
+        volatilidade = dados_limpos.pct_change().std() * 100
+        st.bar_chart(volatilidade)
+
+    st.markdown("---")
+
+    # --- SECTION 3: RAW DATA & EXPORT ---
+    st.subheader("📥 Data Inspection & Export")
+    tab1, tab2 = st.tabs(["Closing Prices", "Daily Returns (%)"])
+    
+    with tab1:
         st.dataframe(dados_limpos, use_container_width=True)
+        # Botão de Download
+        csv = dados_limpos.to_csv().encode('utf-8')
+        st.download_button(label="Download Prices as CSV", data=csv, file_name='market_prices.csv', mime='text/csv')
 
-    with col2:
-        st.subheader("📈 Daily Returns (%)")
+    with tab2:
         retornos = dados_limpos.pct_change().dropna() * 100
         st.dataframe(retornos.style.format("{:.2f}%"), use_container_width=True)
 
-    # 6. Comparative Performance Chart (Base 100)
-    st.markdown("---")
-    st.subheader("📊 Comparative Performance (Base 100)")
-    st.markdown("Visualization: If you had invested $100 in each asset at the start of the period, how much would it be worth today?")
-
-    # Mathematical normalization
-    dados_normalizados = (dados_limpos / dados_limpos.iloc[0]) * 100
-    st.line_chart(dados_normalizados, height=400)
-
 st.markdown("---")
-st.caption("Disclaimer: This dashboard is for portfolio and educational purposes only. Data is provided by Yahoo Finance API.")
+st.caption(f"Last update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Data by Yahoo Finance API")
