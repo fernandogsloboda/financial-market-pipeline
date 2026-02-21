@@ -66,30 +66,24 @@ if not data.empty:
 
     st.markdown("---")
 
-    # --- SECTION 2: PERFORMANCE ANALYSIS ---
-    col_chart, col_stat = st.columns([3, 1])
-    with col_chart:
-        st.subheader("📈 Normalized Performance (Base 100)")
+   # --- SECTION 2: PERFORMANCE & TREND ANALYSIS ---
+    st.subheader("📈 Performance & Trend Analysis")
+    
+    if show_sma:
+        st.markdown("### 🔍 Technical Trend: Crude Oil (WTI)")
+        # Cálculo da Média Móvel de 20 dias para o Petróleo
+        oil_data = data[['Crude Oil']].copy()
+        oil_data['20-Day SMA'] = oil_data['Crude Oil'].rolling(window=20).mean()
+        
+        # Gráfico focado em tendência
+        st.line_chart(oil_data, height=400)
+        st.caption("The 20-Day Simple Moving Average (SMA) helps identify the current price trend, smoothing out daily volatility.")
+    else:
+        # Gráfico Geral de Performance Normalizada (Base 100)
+        st.markdown("### Comparative Performance (Base 100)")
         norm = (data / data.iloc[0]) * 100
-        
-        if show_sma:
-            for col in data.columns:
-                norm[f"{col} (SMA 20)"] = norm[col].rolling(window=20).mean()
-        
-        st.line_chart(norm, height=450)
-        
-    with col_stat:
-        st.subheader("Period Summary")
-        total_ret = ((data.iloc[-1] / data.iloc[0]) - 1) * 100
-        for asset, ret in total_ret.items():
-            color = "green" if ret > 0 else "red"
-            st.markdown(f"**{asset}**: :{color}[{ret:.2f}%]")
-        
-        st.divider()
-        st.info(f"🏆 **Best:** {total_ret.idxmax()}")
-        st.warning(f"📉 **Worst:** {total_ret.idxmin()}")
-
-    st.markdown("---")
+        st.line_chart(norm, height=400)
+        st.caption("Standardized comparison starting at 100 to visualize relative growth across different assets.")
 
     # --- SECTION 3: RISK & CORRELATION (UNIFIED) ---
     st.subheader("🎯 Risk & Correlation Analysis")
