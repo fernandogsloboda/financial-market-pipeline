@@ -8,8 +8,22 @@ st.set_page_config(page_title="Market Intelligence Pro", layout="wide")
 # --- CUSTOM CSS FOR BETTER VISUALS ---
 st.markdown("""
     <style>
-    .main { background-color: #fafafa; }
-    .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .main { background-color: #f0f2f6; }
+    /* Estilização dos Cards de Métrica */
+    [data-testid="stMetric"] {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: 1px solid #e6e9ef;
+    }
+    /* Forçar a cor do texto para garantir leitura em temas claros */
+    [data-testid="stMetricLabel"] {
+        color: #555e6d !important;
+    }
+    [data-testid="stMetricValue"] {
+        color: #31333F !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
