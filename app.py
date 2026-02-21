@@ -3,65 +3,74 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
 
-st.set_page_config(page_title="Market Intelligence", layout="wide")
+# 1. Page Configuration
+st.set_page_config(page_title="Market Intelligence Dashboard", layout="wide")
 
+# 2. Hero Section
 st.title("📈 Financial Market Intelligence Dashboard")
-st.markdown("Painel automatizado de ETL para Commodities e Câmbio.")
+st.markdown("Automated ETL Pipeline for Commodities and FX Analysis.")
 st.markdown("---")
 
-st.sidebar.header("⚙️ Parâmetros da Análise")
-dias_historico = st.sidebar.slider("Selecione o período (Dias):", min_value=7, max_value=365, value=30)
+# 3. Sidebar Configuration
+st.sidebar.header("⚙️ Analysis Parameters")
+dias_historico = st.sidebar.slider("Select Timeframe (Days):", min_value=7, max_value=365, value=30)
 
+# 4. Robust Data Extraction Function
 @st.cache_data(ttl=3600)
 def carregar_dados(dias):
     tickers = ["CL=F", "GC=F", "ZC=F", "BRL=X"]
     end_date = datetime.today()
     start_date = end_date - timedelta(days=dias)
     
-    # Download direto e robusto (funciona com a versão mais nova do yfinance)
+    # Robust download (works with latest yfinance version)
     df = yf.download(tickers, start=start_date, end=end_date, progress=False)
     
     if df.empty:
         return pd.DataFrame()
         
-    # Isola os preços de fechamento (Close)
+    # Isolate Closing Prices
     close_prices = df['Close'].copy()
     
-    # Garante que temos as 4 colunas na ordem correta
+    # Ensure all columns exist
     for ticker in tickers:
         if ticker not in close_prices.columns:
             close_prices[ticker] = None
             
     close_prices = close_prices[tickers]
-    close_prices.columns = ["Crude Oil (USD)", "Gold (USD)", "Corn (USD)", "USD/BRL"]
+    close_prices.columns = ["Crude Oil (WTI)", "Gold", "Corn", "USD/BRL"]
     
-    # Limpa os buracos (ffill)
+    # Data Cleaning (Forward Fill for market holidays)
     return close_prices.ffill().dropna()
 
-st.write(f"🔄 Extraindo dados dos últimos **{dias_historico} dias** via Yahoo Finance API...")
+st.write(f"🔄 Extracting data for the last **{dias_historico} days** via Yahoo Finance API...")
 
-# Executa a extração
+# Execute Extraction
 dados_limpos = carregar_dados(dias_historico)
 
-# O Escudo de Proteção: Só faz os cálculos se os dados existirem
+# 5. Safety Shield & Display
 if dados_limpos.empty:
-    st.error("⚠️ Os dados retornaram vazios. O Yahoo Finance pode estar passando por uma instabilidade momentânea ou o mercado está fechado. Tente alterar os dias no menu lateral.")
+    st.error("⚠️ Data returned empty. Yahoo Finance might be unstable or markets are closed. Try adjusting the timeframe in the sidebar.")
 else:
+    # Top Metrics Row
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("📊 Tabela de Preços (Raw Data)")
+        st.subheader("📊 Price History (Raw Data)")
         st.dataframe(dados_limpos, use_container_width=True)
 
     with col2:
-        st.subheader("📈 Retorno Diário (%)")
+        st.subheader("📈 Daily Returns (%)")
         retornos = dados_limpos.pct_change().dropna() * 100
         st.dataframe(retornos.style.format("{:.2f}%"), use_container_width=True)
 
+    # 6. Comparative Performance Chart (Base 100)
     st.markdown("---")
-    st.subheader("📊 Performance Comparativa (Base 100)")
-    st.markdown("Se você tivesse investido $100 em cada ativo no início do período, quanto teria hoje?")
+    st.subheader("📊 Comparative Performance (Base 100)")
+    st.markdown("Visualization: If you had invested $100 in each asset at the start of the period, how much would it be worth today?")
 
-    # Agora o cálculo matemático está seguro!
+    # Mathematical normalization
     dados_normalizados = (dados_limpos / dados_limpos.iloc[0]) * 100
     st.line_chart(dados_normalizados, height=400)
+
+st.markdown("---")
+st.caption("Disclaimer: This dashboard is for portfolio and educational purposes only. Data is provided by Yahoo Finance API.")
