@@ -11,7 +11,7 @@ st.markdown("""
     .main { background-color: #fafafa; }
     .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     </style>
-    """, unsafe_base_curve=True)
+    """, unsafe_allow_html=True)
 
 st.title("📈 Professional Market Intelligence Dashboard")
 st.markdown("Automated ETL & Quantitative Analytics for Global Assets.")
