@@ -1,49 +1,50 @@
-# 📈 Financial Market Data Pipeline & Quantitative Analysis
-### 🔴 **Live Web App:** [Click here to access the Interactive Dashboard](https://fernando-market-data.streamlit.app)
+# 🏛️ Alpha Market Intelligence Pro
+### 🔴 **Live Web App:** [Access the Interactive Dashboard](https://fernando-market-data.streamlit.app)
 
 ## 🎯 Project Overview
-In the financial and commodities markets, having access to clean, reliable, and real-time data is critical for strategic decision-making. Manual data extraction is prone to human error and highly inefficient. 
+In high-stakes financial environments, the ability to transform raw market data into actionable insights is the true "Alpha". This project is a professional **Quantitative ETL Pipeline & Analytics Dashboard** designed to monitor global assets in real-time.
 
-This project is an automated **ETL (Extract, Transform, Load) Pipeline** built in Python. It extracts real-time market data for key global assets via the Yahoo Finance API, cleans missing time-series data due to market holidays, calculates quantitative financial metrics, and generates a normalized visualization for comparative performance.
+Instead of static reports, this tool provides a dynamic interface for analyzing price trends, correlations, and volatility, allowing stakeholders to make data-driven decisions regarding Commodities and FX markets.
 
-### 📊 Monitored Assets
-- **Crude Oil (WTI)** - Global energy benchmark
-- **Gold** - Traditional safe-haven asset
-- **Corn** - Key agricultural commodity
-- **USD/BRL** - Currency exchange rate for emerging markets context
+### 📊 Assets Monitored (Real-Time API)
+- **Crude Oil (WTI):** Energy sector benchmark.
+- **Gold:** Global safe-haven and inflation hedge.
+- **Corn:** Agricultural supply chain indicator.
+- **USD/BRL:** Emerging markets currency risk.
 
 ---
 
-## 🚀 Key Features & Pipeline Architecture
+## 🚀 Technical Architecture & Features
 
-### Phase 1: Data Ingestion (API Extraction)
-- Replaced fragile web scraping techniques with robust API calls using `yfinance`.
-- Fetches 30 days of historical daily closing prices.
-- Highly resilient: zero CAPTCHA blocks, no HTML parsing errors, and structured data output.
+### 1. Data Engineering (ETL)
+- **Extraction:** Automated ingestion via `yfinance` API, eliminating manual data entry.
+- **Transformation:** Robust cleaning pipeline using `pandas`. It handles market holidays and time-zone misalignments using **Forward Fill (ffill)** logic to ensure time-series integrity.
+- **Loading:** Data is processed in-memory and cached using `@st.cache_data` to optimize performance and API limits.
 
-### Phase 2: Time-Series Transformation & Cleaning
-- **Missing Data Imputation:** Utilized the Forward Fill (`ffill`) method to handle `NaN` values caused by weekend and holiday market closures, ensuring a continuous time-series.
-- **Financial Metrics:** Calculated Daily Returns (%) and Annualized Volatility to assess asset risk.
-- Calculated the Total Return for the period.
+### 2. Quantitative Analytics
+- **Normalized Performance (Base 100):** Mathematical standardization to compare asset growth regardless of their nominal price differences.
+- **Risk Metrics:** Calculation of **Annualized Volatility** (Std Dev * sqrt(252)) to quantify market risk.
+- **Inter-asset Correlation:** A dynamic **Correlation Matrix** with heatmapping to identify how assets move in relation to each other (Diversification Analysis).
 
-### Phase 3: Visualization & Export
-- **Base 100 Normalization:** Standardized all asset prices to a starting value of 100. This allows for an accurate visual comparison of percentage growth regardless of the underlying asset's nominal price (e.g., comparing $5,000 Gold to $60 Oil).
-- **Automated Export:** Generates clean `.csv` datasets and high-resolution `.png` charts ready for business intelligence dashboards or management reports.
-- ![Asset Performance Chart - Last 30 Days](asset_performance_chart.png)
+### 3. Professional UI/UX (Streamlit)
+- **Real-Time KPIs:** Custom-styled metric cards showing current price and daily delta.
+- **Interactive Timeframes:** Users can adjust the analysis window from 7 to 365 days.
+- **Data Portability:** Integrated "Export to CSV" feature for downstream analysis in Excel or BI tools.
 
 ---
 
 ## 🛠️ Tech Stack
-- **Language:** Python 3.x
-- **Data Extraction:** `yfinance` (Official Yahoo Finance API wrapper)
-- **Data Manipulation:** `pandas`, `numpy`
-- **Data Visualization:** `matplotlib`
+- **Language:** Python 3.13+
+- **Framework:** Streamlit (Web UI)
+- **Data Science:** Pandas, NumPy (Vectorized calculations)
+- **Finance API:** yfinance
+- **Styling:** Custom CSS for high-contrast UI components
 
 ---
 
-## ⚙️ How to Run the Project
+## ⚙️ Quick Start (Run Locally)
 
-1. Clone this repository to your local machine.
-2. Install the required dependencies using:
-   ```bash
-   pip install -r requirements.txt
+To clone and run this application on your machine in one go, paste this into your terminal:
+
+```bash
+git clone [https://github.com/fernandogsloboda/financial-market-pipeline.git](https://github.com/fernandogsloboda/financial-market-pipeline.git) && cd financial-market-pipeline && pip install -r requirements.txt && streamlit run app.py
