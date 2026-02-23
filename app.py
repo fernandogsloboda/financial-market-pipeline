@@ -37,7 +37,6 @@ st.markdown("""
 st.sidebar.title("📊 Control Panel")
 st.sidebar.markdown("Configure analysis timeframe and indicators.")
 dias_historico = st.sidebar.slider("Analysis Period (Days)", 7, 365, 60)
-show_sma = st.sidebar.checkbox("Show 20-Day Moving Average", value=False)
 
 @st.cache_data(ttl=3600)
 def fetch_data(dias):
@@ -66,11 +65,12 @@ if not data.empty:
 
     st.markdown("---")
 
-  # --- SECTION 2: PERFORMANCE ANALYSIS ---
+    # --- SECTION 2: PERFORMANCE ANALYSIS ---
     st.subheader("📈 Comparative Performance (Base 100)")
     norm = (data / data.iloc[0]) * 100
     st.line_chart(norm, height=450)
     st.caption("Standardized comparison starting at 100 to visualize relative growth across different assets.")
+    
     # --- SECTION 3: RISK & CORRELATION (UNIFIED) ---
     st.subheader("🎯 Risk & Correlation Analysis")
     c1, c2 = st.columns(2)
